@@ -1,7 +1,7 @@
 # 说明  
 
 使用sentence-bert在LCQMC上微调reberta-wwm-ext，主要用于句子相似度匹配  
-使用onnx框架加速推理
+使用onnx框架加速推理，在1080Ti上的单挑推理速度为6.6ms（比17.3ms缩短了近60%）
 
 ## 微调后的参数文件 
  
