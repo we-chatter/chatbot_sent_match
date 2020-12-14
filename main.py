@@ -5,119 +5,115 @@ Author: ByronVon
 Email: wangy@craiditx.com
 Version: 
 Date: 2020-12-11 17:22:23
-LastEditTime: 2020-12-14 12:29:04
+LastEditTime: 2020-12-14 17:07:28
 '''
 
 import sys
 import argparse
 
-import torch
-
 
 def run_train(args):
     """
-    use_gpu,
-    pretrained_model_path,
-    encode_path,
-    weight_path, 
-    # 下面这些参数已经调好了，测试的时候可以直接用
-    # train_data, 
-    # valid_data, 
-    # epochs, 
-    # batch_size, 
-    # shuffle=True, 
-    # fn=collate_fn
-
+    目前支持的参数
+    pretrain_model_path, 
+    finetune_model_path, 
+    train_data=BasicConfig.train_data_path, 
+    valid_data=BasicConfig.valid_data_path, 
+    epochs=BasicConfig.epochs, 
+    batch_size=BasicConfig.batch_size, 
+    lr = BasicConfig.learning_rate,
+    shuffle=True
     """
     parser = argparse.ArgumentParser()
-    
-    parser.add_argument('--use_gpu', type=bool, help='use gpu or not', default=True)
-    parser.add_argument('--pretrained_model_path', type=str, help='pretrained model path', default='/Users/wonbyron/Desktop/work/NLP-Demo/module/sent_match/chinese_roberta_wwm_ext_pytorch')
-    parser.add_argument('--encode_path', type=str, help='save finetuned bert encoder', default='encode')
-    parser.add_argument('--weight_path', type=str, help='weight path', default='tmp.bin')
-    # parser.add_argument('--train_data_path', type=str, help='train_data_path', default=None)
-    # parser.add_argument('--valid_data_path', type=str, help='valid_data_path', default=None)
-    # parser.add_argument('--epochs', type=int, help='epochs for finetune', default=10)
-    # parser.add_argument('--batch_size', type=int, help='batch_size for finetune', default=16)
+
+    parser.add_argument('--pretrain_model_path', type=str, help='pretrain model path', default='./chinese_roberta_wwm_ext_pytorch/')
+    parser.add_argument('--finetune_model_path', type=str, help='finetune model path', default='tmp.bin')
 
     args = parser.parse_args() ## 解析配置参数 ## args.epochs 就可以调用结果
 
-    from sent_match import finetune
+    from model import finetune
 
     finetune.train(
-        use_gpu=args.use_gpu, 
-        pretrained_model_path=args.pretrained_model_path,
-        encode_path=args.encode_path,
-        weight_path=args.weight_path,
+        pretrain_model_path=args.pretrain_model_path,
+        finetune_model_path=args.finetune_model_path,
         )
+    """
+    2020-12-14 17:03:05,378--root--finetune.py--DEBUG--model initializerd
+    10%|████████████                                                                                                            | 1/10 [01:45<15:53, 105.96s/it]
+    """
     
 
 def run_test(args):
     """
-    use_gpu,
-    weight_path, 
-    ## 参数已经设置好了
-    # test_data, 
-    # batch_size, 
-    # shuffle=False, 
-    # fn=collate_fn
+    pretrain_model_path, 
+    finetune_model_path, 
+    test_data=BasicConfig.test_data_path, 
+    batch_size=BasicConfig.batch_size, 
+    shuffle=False, 
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--use_gpu', type=bool, help='use gpu or not', default=False)
-    parser.add_argument('--pretrained_model_path', type=str, help='pretrained model path', default='/Users/wonbyron/Desktop/work/NLP-Demo/module/sent_match/chinese_roberta_wwm_ext_pytorch')
-    parser.add_argument('--weight_path', type=str, help='finetuned model path', default='/Users/wonbyron/Desktop/work/NLP-Demo/tmp/smodel/smodel.bin')
-    # parser.add_argument('--test_data_path', type=str, help='test_data_path', default=None)   
-    # parser.add_argument('--batch_size', type=int, help='batch_size for finetune', default=16)
+    parser.add_argument('--pretrain_model_path', type=str, help='pretrain model path', default='./chinese_roberta_wwm_ext_pytorch/')
+    parser.add_argument('--finetune_model_path', type=str, help='finetune model path', default='model.bin')
 
     args = parser.parse_args()
 
-    from sent_match import finetune
+    from model import finetune
 
     print(
         finetune.test(
-        use_gpu=args.use_gpu,
-        pretrained_model_path=args.pretrained_model_path,
-        weight_path=args.weight_path,)
+        pretrain_model_path=args.pretrain_model_path,
+        finetune_model_path=args.finetune_model_path,
+        )
     )
-    
+    """
+    2020-12-14 17:00:57,014--root--finetune.py--DEBUG--model initialized
+    100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 7/7 [00:24<00:00,  3.49s/it]
+    0.89
+    """
 
 def run_convert(args):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--use_gpu', type=bool, help='use gpu or not', default=False)
-    parser.add_argument('--pretrained_model_path', type=str, help='pretrained model path', default='/Users/wonbyron/Desktop/work/NLP-Demo/tmp/smodel_vector') ## 
-    parser.add_argument('--weight_path', type=str, help='finetuned weight path', default=None)
-    parser.add_argument('--onnx_model_path', type=str, help='onnx export model path', default='sent_encoder.onnx')
+    parser.add_argument('--pretrain_model_path', type=str, help='pretrain model path', default='./chinese_roberta_wwm_ext_pytorch') ## 
+    parser.add_argument('--finetune_model_path', type=str, help='finetune weight path', default='./model.bin')
+    parser.add_argument('--onnx_model_path', type=str, help='onnx export model path', default='./tmp.onnx')
 
-    from sent_match.inference import conv
     args = parser.parse_args()
     
+    from model.inference import conv
+
     conv(
-        use_gpu=args.use_gpu, 
-        pretrained_model_path=args.pretrained_model_path,
-        weight_path=args.weight_path,
-        onnx_model_path=args.onnx_model_path)
+        pretrain_model_path=args.pretrain_model_path,
+        finetune_model_path=args.finetune_model_path,
+        onnx_model_path=args.onnx_model_path
+        )
 
 
 def run_inference(args):
-    parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser()
 
-    parser.add_argument('--onnx_model_path', type=str, help='onnx_model_path', default='/Users/wonbyron/Desktop/work/NLP-Demo/module/sent_encoder.onnx')
-    parser.add_argument('--sentences', type=str, help='sentences', default='我爱我家')
+    # parser.add_argument('--onnx_model_path', type=str, help='onnx model path', default='./tmp.onnx')
+    # parser.add_argument('--sentences', type=str, help='sentences', default='我爱我家')
 
-    args = parser.parse_args()
+    # args = parser.parse_args()
 
     import torch
-    from sent_match.inference import infer
+    from model.inference import infer
     
-    sent_a = torch.tensor(infer(args.onnx_model_path, '你是问e租宝理财安全码吗？')[0])
-    sent_b = torch.tensor(infer(args.onnx_model_path, '你是问e租包理财安全吗')[0])
-    sent_c = torch.tensor(infer(args.onnx_model_path, 'e租包理财安全吗？')[0])
+    sent_a = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './sent_encoder.onnx', '你是问e租宝理财安全码吗？')[0])
+    sent_b = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './sent_encoder.onnx', '你是问e租包理财安全吗')[0])
+    sent_c = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './sent_encoder.onnx', 'e租包理财安全吗？')[0])
 
     print(torch.cosine_similarity(sent_a, sent_b))
     print(torch.cosine_similarity(sent_a, sent_c))
     print(torch.cosine_similarity(sent_b, sent_c))
+
+    """
+    tensor([0.8946])
+    tensor([0.8852])
+    tensor([0.9786])
+    """
 
 if __name__ == "__main__":
 
@@ -125,3 +121,24 @@ if __name__ == "__main__":
     # run_test(sys.argv[1:]) ## 测试训练
     # run_convert(sys.argv[1:]) ## 测试模型转换
     run_inference(sys.argv[1:]) ## 测试infer
+
+    # from sent_match.model import SentenceBertModel
+    # from sent_match.finetune import collate_fn
+
+    # device = torch.device('cpu')
+    # model = SentenceBertModel(model_path='/Users/wonbyron/bert/chinese_roberta_wwm_ext_pytorch/')
+    # model.load_state_dict(torch.load('/Users/wonbyron/Desktop/work/NLP-Demo/tmp/smodel/smodel.bin', map_location=device))
+    # model.to(device)
+    # model.eval()
+
+    # input_ids_0, input_ids_1, labels = collate_fn([[('哪种减肥药最快最有效', '减肥效果最好'),0]])
+
+    # print(input_ids_0)
+    # print(input_ids_1)
+    # with torch.no_grad():
+    #     pred, loss = model(
+    #         torch.tensor(input_ids_0,dtype=torch.long).to(device),
+    #         torch.tensor(input_ids_1,dtype=torch.long).to(device)
+    #     )
+    # # print(model.eval())
+    # print(pred, loss)
