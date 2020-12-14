@@ -1,0 +1,5 @@
+torch==1.6.0
+transformers==4.0.0
+onnx==1.8.0
+onnxruntime==1.5.1
+onnxruntime-tools==1.5.2
