@@ -3,6 +3,10 @@
 使用sentence-bert在LCQMC上微调reberta-wwm-ext，主要用于句子相似度匹配  
 使用onnx框架加速推理
 
+## 微调后的参数文件 
+ 
+链接: https://pan.baidu.com/s/14uvJNTAgiTzd70xm9-SD5g  密码: s1bt  
+
 ## 句子转向量  
 
 ```python
