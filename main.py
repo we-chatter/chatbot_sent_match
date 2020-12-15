@@ -5,7 +5,7 @@ Author: ByronVon
 Email: wangy@craiditx.com
 Version: 
 Date: 2020-12-11 17:22:23
-LastEditTime: 2020-12-14 17:07:28
+LastEditTime: 2020-12-15 18:56:21
 '''
 
 import sys
@@ -78,6 +78,7 @@ def run_convert(args):
     parser.add_argument('--pretrain_model_path', type=str, help='pretrain model path', default='./chinese_roberta_wwm_ext_pytorch') ## 
     parser.add_argument('--finetune_model_path', type=str, help='finetune weight path', default='./model.bin')
     parser.add_argument('--onnx_model_path', type=str, help='onnx export model path', default='./tmp.onnx')
+    parser.add_argument('--batch_inference', type=bool, help='enable batch inference', default=True)
 
     args = parser.parse_args()
     
@@ -86,7 +87,8 @@ def run_convert(args):
     conv(
         pretrain_model_path=args.pretrain_model_path,
         finetune_model_path=args.finetune_model_path,
-        onnx_model_path=args.onnx_model_path
+        onnx_model_path=args.onnx_model_path,
+        batch_inference=args.batch_inference,
         )
 
 
@@ -101,13 +103,17 @@ def run_inference(args):
     import torch
     from model.inference import infer
     
-    sent_a = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './sent_encoder.onnx', '你是问e租宝理财安全码吗？')[0])
-    sent_b = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './sent_encoder.onnx', '你是问e租包理财安全吗')[0])
-    sent_c = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './sent_encoder.onnx', 'e租包理财安全吗？')[0])
+    sent_a = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './tmp.onnx', '你是问e租宝理财安全码吗？')[0])
+    sent_b = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './tmp.onnx', '你是问e租包理财安全吗')[0])
+    sent_c = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './tmp.onnx', 'e租包理财安全吗？')[0])
+
+    sent_d = torch.tensor(infer('./chinese_roberta_wwm_ext_pytorch', './tmp.onnx', ['你是问e租宝理财安全码吗？', '你是问e租包理财安全吗', 'e租包理财安全吗？']))
 
     print(torch.cosine_similarity(sent_a, sent_b))
     print(torch.cosine_similarity(sent_a, sent_c))
     print(torch.cosine_similarity(sent_b, sent_c))
+
+    print(sent_d)
 
     """
     tensor([0.8946])
