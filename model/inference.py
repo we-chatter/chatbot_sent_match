@@ -2,10 +2,10 @@
 
 '''
 Author: ByronVon
-Email: wangy@craiditx.com
+Email: sir.housir@gmail.com
 Version: 
 Date: 2020-12-11 17:13:27
-LastEditTime: 2020-12-15 18:47:12
+LastEditTime: 2020-12-30 14:38:17
 '''
 
 from numpy.lib.function_base import gradient

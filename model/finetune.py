@@ -2,10 +2,10 @@
 
 '''
 Author: ByronVon
-Email: wangy@craiditx.com
+Email: sir.housir@gmail.com
 Version: 
 Date: 2020-12-11 17:16:26
-LastEditTime: 2020-12-14 17:00:27
+LastEditTime: 2020-12-30 14:38:05
 '''
 
 import torch
